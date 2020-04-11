@@ -1,0 +1,10 @@
+insert into warehouses (city, x, y) values ('Gdańsk', 1838, 5422);
+insert into warehouses (city, x, y) values ('Białystok', 2310, 5308);
+insert into warehouses (city, x, y) values ('Warszawa', 2102, 5212);
+insert into warehouses (city, x, y) values ('Kraków', 1957, 5003);
+insert into warehouses (city, x, y) values ('Szczecin', 1434, 5326);
+insert into warehouses (city, x, y) values ('Wrocław', 1702, 5107);
+insert into warehouses (city, x, y) values ('Poznań', 1655, 5225);
+insert into warehouses (city, x, y) values ('Lublin', 2234, 5114);
+insert into warehouses (city, x, y) values ('Zielona Góra', 1530, 5156);
+insert into warehouses (city, x, y) values ('Łódź', 1928, 5147);
