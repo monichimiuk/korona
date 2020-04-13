@@ -17,8 +17,8 @@ public class Warehouse implements GeoLocation {
     private String city;
     private long x;
     private long y;
-//, fetch= FetchType.EAGER
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "warehouse")
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "warehouse", fetch= FetchType.EAGER)
     private List<ProductStock> productStocks;
 
     @Override
