@@ -5,8 +5,9 @@ import dev.onichimiuk.marcin.geolocation.GeoLocation;
 import dev.onichimiuk.marcin.warehouse.model.Warehouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -15,10 +16,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -29,6 +33,34 @@ public class WarehouseServlet {
     private WarehouseService service;
 
     public WarehouseServlet(WarehouseService service) { this.service = service; }
+
+    @GetMapping("warehouse/{warehouseId}/geolocation")
+    public ResponseEntity getGeoLocation(@Valid @PathVariable("warehouseId") Integer warehouseId){
+
+        var warehouse = service.getWarehouseById(warehouseId);
+
+        if (warehouse.isPresent()) {
+
+            var x = warehouse.get().getX();
+            var y = warehouse.get().getY();
+
+            GeoLocation location = new GeoLocation() {
+                @Override
+                public long getX() { return x; }
+                @Override
+                public long getY() { return y; }
+            };
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(location);
+        }
+        else{
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("There is no warehouse with id = "+warehouseId);
+        }
+    }
 
     // Jako zmienne x, y - przyjąłem współrzędne geograficzne miast Polski ze stopniami i minutami bez znaczników
     // np. Bydgoszcz  18°00'E  53°07'N  ma współrzędne x = 1800, y = 5307.

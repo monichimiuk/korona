@@ -4,10 +4,8 @@ import dev.onichimiuk.marcin.geolocation.GeoLocation;
 import dev.onichimiuk.marcin.geolocation.GeoService;
 import dev.onichimiuk.marcin.warehouse.model.Warehouse;
 import org.springframework.stereotype.Service;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +18,12 @@ public class WarehouseService {
 
     WarehouseRepository repository;
     GeoService geoService;
+
+    public Optional<Warehouse> getWarehouseById(Integer warehouseId){
+        var warehouse = repository.findById(Long.valueOf(warehouseId));
+
+        return Optional.of(warehouse).orElse(null);
+    }
 
     //Zwracanie listy najbliższych magazynów gdzie można dostać zamówione produkty w podanej ilości. Gdy nie ma jakiegoś produktu
     //zwracany jest błąd biznesowy z komunikatem, że w takiej ilości brakuje produktu w magazynach. Na wejściu przekazuje się
