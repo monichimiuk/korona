@@ -34,7 +34,7 @@ class KoronaApplicationTests {
 		x = 1928; y = 5147; // Łódź
 
 		//when
-		var result = service.findNearestConfiguration(location, map);
+		var result = service.testMethod(location, map);
 
 		//then
 		List<Warehouse> resultList = new ArrayList<>(result);
@@ -49,7 +49,7 @@ class KoronaApplicationTests {
 		x = 1530; y = 5156; // Zielona Góra
 
 		//when
-		var result = service.findNearestConfiguration(location,map);
+		var result = service.testMethod(location,map);
 
 		//then
 		assertTrue(result.removeIf(w -> w.getCity().equals("Zielona Góra")));
@@ -65,7 +65,7 @@ class KoronaApplicationTests {
 		x = 1928; y = 5147; // Łódź
 
 		//when
-		var result = service.findNearestConfiguration(location,map);
+		var result = service.testMethod(location,map);
 
 		//then
 		assertEquals(0, result.size());
@@ -80,7 +80,7 @@ class KoronaApplicationTests {
 
 		//when then
 		try{
-			var result = service.findNearestConfiguration(location,map);
+			var result = service.testMethod(location,map);
 		} catch (NullPointerException e){
 			assertEquals("Produkt pasta nie występuje w ilości 9999 w żadnym magazynie. Zmodyfikuj zamówienie.", e.getMessage());
 		}

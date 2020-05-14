@@ -3,6 +3,7 @@ package dev.onichimiuk.marcin.warehouse;
 import dev.onichimiuk.marcin.geolocation.GeoLocation;
 import dev.onichimiuk.marcin.geolocation.GeoService;
 import dev.onichimiuk.marcin.warehouse.model.Warehouse;
+import dev.onichimiuk.marcin.warehouse.transport.OrderItemDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,10 +26,41 @@ public class WarehouseService {
         return Optional.of(warehouse).orElse(null);
     }
 
-    //Zwracanie listy najbliższych magazynów gdzie można dostać zamówione produkty w podanej ilości. Gdy nie ma jakiegoś produktu
-    //zwracany jest błąd biznesowy z komunikatem, że w takiej ilości brakuje produktu w magazynach. Na wejściu przekazuje się
-    //lokacje zamawiającego oraz mapę zamówienia produktów np.  key:rice value:78, key:pasta value:14.
-    public Set<Warehouse> findNearestConfiguration(GeoLocation location, Map<String, Integer> map) throws Exception {
+    public List<OrderItemDTO> findNearestConfiguration(GeoLocation location, Map<String, Integer> map) {
+
+        var warehouseList = repository.findAll();
+        List<OrderItemDTO> itemList = new ArrayList<>();
+
+        for (Map.Entry<String,Integer> entry : map.entrySet()) {
+
+            List<Warehouse> warehousesWithProduct = warehouseList.stream()
+                    .filter(w -> w.getProductStocks()
+                            .stream()
+                            .filter(productStock -> productStock.getProductCode().equals(entry.getKey()))
+                            .anyMatch(productStock -> productStock.getAmount() >= entry.getValue()))
+                    .collect(Collectors.toList());
+
+            Warehouse nearestWarehouse = geoService.findNearestOfList(warehousesWithProduct, location);
+
+            if(nearestWarehouse != null) {
+                itemList.add(OrderItemDTO.builder()
+                        .productCode(entry.getKey())
+                        .number(entry.getValue())
+                        .warehouseId(String.valueOf(nearestWarehouse.getId()))
+                        .build());
+            }else{
+                itemList.add(OrderItemDTO.builder()
+                        .productCode(entry.getKey())
+                        .number(entry.getValue())
+                        .build());
+            }
+        }
+
+        return itemList;
+    }
+
+    //------------------------------------------------------------------------------------------------------------
+    public Set<Warehouse> testMethod(GeoLocation location, Map<String, Integer> map) throws Exception {
         var warehouseList = repository.findAll();
         Set<Warehouse> cumulatedWarehouses = new HashSet<>();
 
@@ -52,4 +84,5 @@ public class WarehouseService {
         }
         return cumulatedWarehouses;
     }
+    //-----------------------------------------------------------------------------------------------------------
 }
