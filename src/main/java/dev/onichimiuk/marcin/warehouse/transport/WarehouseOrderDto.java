@@ -5,7 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Data
-public class WarehouseOrder {
+public class WarehouseOrderDto {
 
     private Location location;
 
