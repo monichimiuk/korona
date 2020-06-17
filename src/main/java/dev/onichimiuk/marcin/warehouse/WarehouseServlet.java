@@ -3,6 +3,7 @@ package dev.onichimiuk.marcin.warehouse;
 import dev.onichimiuk.marcin.geolocation.GeoLocation;
 import dev.onichimiuk.marcin.warehouse.transport.OrderItemDTO;
 import dev.onichimiuk.marcin.warehouse.transport.WarehouseOrderDto;
+import dev.onichimiuk.marcin.warehouse.transport.WarehouseResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -53,7 +54,7 @@ public class WarehouseServlet {
     }
 
     @PostMapping("order")
-    ResponseEntity<List<OrderItemDTO>> findNearestConfiguration(@Validated @RequestBody WarehouseOrderDto warehouseOrder) {
+    ResponseEntity<WarehouseResponseDto> findNearestConfiguration(@Validated @RequestBody WarehouseOrderDto warehouseOrder) {
 
         var productsMap = warehouseOrder.getOrderItem().stream()
                 .collect(Collectors.toMap(OrderItemDTO::getProductCode,OrderItemDTO::getNumber));
@@ -68,7 +69,10 @@ public class WarehouseServlet {
             public long getY() { return y; }
         };
 
-        return ResponseEntity.ok(service.findNearestConfiguration(location, productsMap));
+        WarehouseResponseDto warehouseResponse = new WarehouseResponseDto();
+        warehouseResponse.setOrderItem(service.findNearestConfiguration(location, productsMap));
+
+        return ResponseEntity.ok(warehouseResponse);
     }
 
 
