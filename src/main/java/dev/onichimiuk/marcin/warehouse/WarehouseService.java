@@ -34,8 +34,6 @@ public class WarehouseService {
 
         warehouseOrderDto.getOrderItem().forEach(entry -> {
 
-
-
             List<Warehouse> warehousesWithProduct = warehouseList.stream()
                     .filter(w -> w.getProductStocks()
                             .stream()
@@ -49,6 +47,7 @@ public class WarehouseService {
                 @Override
                 public long getY() { return warehouseOrderDto.getLocation().getY(); }
             };
+
             Warehouse nearestWarehouse = geoService.findNearestOfList(warehousesWithProduct, location);
 
             if(nearestWarehouse != null) {
