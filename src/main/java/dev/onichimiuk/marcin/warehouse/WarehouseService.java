@@ -4,6 +4,7 @@ import dev.onichimiuk.marcin.geolocation.GeoLocation;
 import dev.onichimiuk.marcin.geolocation.GeoService;
 import dev.onichimiuk.marcin.warehouse.model.Warehouse;
 import dev.onichimiuk.marcin.warehouse.transport.OrderItemDTO;
+import dev.onichimiuk.marcin.warehouse.transport.WarehouseOrderDto;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,35 +27,45 @@ public class WarehouseService {
         return Optional.of(warehouse).orElse(null);
     }
 
-    public List<OrderItemDTO> findNearestConfiguration(GeoLocation location, Map<String, Integer> map) {
+    public List<OrderItemDTO> findNearestConfiguration(WarehouseOrderDto warehouseOrderDto) {
 
         var warehouseList = repository.findAll();
         List<OrderItemDTO> itemList = new ArrayList<>();
 
-        for (Map.Entry<String,Integer> entry : map.entrySet()) {
+        warehouseOrderDto.getOrderItem().forEach(entry -> {
+
+
 
             List<Warehouse> warehousesWithProduct = warehouseList.stream()
                     .filter(w -> w.getProductStocks()
                             .stream()
-                            .filter(productStock -> productStock.getProductCode().equals(entry.getKey()))
-                            .anyMatch(productStock -> productStock.getAmount() >= entry.getValue()))
+                            .filter(productStock -> productStock.getProductCode().equals(entry.getProductCode()))
+                            .anyMatch(productStock -> productStock.getAmount() >= entry.getNumber()))
                     .collect(Collectors.toList());
 
+            GeoLocation location = new GeoLocation() {
+                @Override
+                public long getX() { return warehouseOrderDto.getLocation().getX(); }
+                @Override
+                public long getY() { return warehouseOrderDto.getLocation().getY(); }
+            };
             Warehouse nearestWarehouse = geoService.findNearestOfList(warehousesWithProduct, location);
 
             if(nearestWarehouse != null) {
                 itemList.add(OrderItemDTO.builder()
-                        .productCode(entry.getKey())
-                        .number(entry.getValue())
+                        .id(entry.getId())
+                        .productCode(entry.getProductCode())
+                        .number(entry.getNumber())
                         .warehouseId(String.valueOf(nearestWarehouse.getId()))
                         .build());
             }else{
                 itemList.add(OrderItemDTO.builder()
-                        .productCode(entry.getKey())
-                        .number(entry.getValue())
+                        .id(entry.getId())
+                        .productCode(entry.getProductCode())
+                        .number(entry.getNumber())
                         .build());
             }
-        }
+        });
 
         return itemList;
     }

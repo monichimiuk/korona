@@ -62,15 +62,10 @@ public class WarehouseServlet {
         var x = warehouseOrder.getLocation().getX();
         var y = warehouseOrder.getLocation().getY();
 
-        GeoLocation location = new GeoLocation() {
-            @Override
-            public long getX() { return x; }
-            @Override
-            public long getY() { return y; }
-        };
 
         WarehouseResponseDto warehouseResponse = new WarehouseResponseDto();
-        warehouseResponse.setOrderItem(service.findNearestConfiguration(location, productsMap));
+        //todo przekazac order
+        warehouseResponse.setOrderItem(service.findNearestConfiguration(warehouseOrder));
 
         return ResponseEntity.ok(warehouseResponse);
     }
